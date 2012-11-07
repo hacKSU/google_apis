@@ -1,0 +1,39 @@
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.5/jquery.min.js"></script>
+
+<style>
+img { height:20px; }
+.name { margin-left:5px; font-size:20px; font-weight:bold; }
+.address { margin-left:25px; font-size:12px; font-colot:lightgray; }
+</style>
+
+<script type="text/javascript">
+
+/*
+	Make an ajax call to Google Places API
+	Using:
+		location : A longitude, latitude pair.
+		radius : How big the circle around your beginning point is.
+		types : What types of places to return.
+		sensor : Does the device viewing this have a geolocator?
+		key : YOUR API KEY.
+
+	When we receive the data, we loop through it (using a "for each" loop) and print relevant pieces in basic HTML.
+	Our place variable is used as the index in the data["results"] array.
+	So, data["results"][place]["WHATEVER"] returns the element associated with "WHATEVER" inside the place'th element of data["results"].
+	
+	As always, play and learn.
+	Try this instead of a for loop to see the data structure:
+		document.write(JSON.stringify(data));
+*/
+
+$(document).ready(function(){
+	$.ajax({
+		url: "https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=41.1536,-81.3581&radius=500&types=food&sensor=false&key=YOUR_API_KEY"
+	}).done(function(data){
+		for (var place in data["results"]) {
+			$("body").append("<div><img src='"+data["results"][place]["icon"]+"' /><a class='name'>"+data["results"][place]["name"]+"</a><br /><a class='address'>"+data["results"][place]["vicinity"]+"</a></div><br />");
+		}
+	});
+});
+
+</script>
