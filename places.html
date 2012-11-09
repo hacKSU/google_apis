@@ -1,39 +1,76 @@
-<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.5/jquery.min.js"></script>
 
-<style>
-img { height:20px; }
-.name { margin-left:5px; font-size:20px; font-weight:bold; }
-.address { margin-left:25px; font-size:12px; font-colot:lightgray; }
-</style>
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Google Maps JavaScript API v3 Example: Place Search</title>
+    <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=true&libraries=places"></script>
 
-<script type="text/javascript">
+    <style>
+      #map {
+        height: 400px;
+        width: 600px;
+        border: 1px solid #333;
+        margin-top: 0.6em;
+      }
+    </style>
 
-/*
-	Make an ajax call to Google Places API
-	Using:
-		location : A longitude, latitude pair.
-		radius : How big the circle around your beginning point is.
-		types : What types of places to return.
-		sensor : Does the device viewing this have a geolocator?
-		key : YOUR API KEY.
+    <script>
+      var map;
+      var infowindow;
 
-	When we receive the data, we loop through it (using a "for each" loop) and print relevant pieces in basic HTML.
-	Our place variable is used as the index in the data["results"] array.
-	So, data["results"][place]["WHATEVER"] returns the element associated with "WHATEVER" inside the place'th element of data["results"].
-	
-	As always, play and learn.
-	Try this instead of a for loop to see the data structure:
-		document.write(JSON.stringify(data));
-*/
+      function initialize() {
+        var pyrmont = new google.maps.LatLng(41.1489, -81.3418);
 
-$(document).ready(function(){
-	$.ajax({
-		url: "https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=41.1536,-81.3581&radius=500&types=food&sensor=false&key=YOUR_API_KEY"
-	}).done(function(data){
-		for (var place in data["results"]) {
-			$("body").append("<div><img src='"+data["results"][place]["icon"]+"' /><a class='name'>"+data["results"][place]["name"]+"</a><br /><a class='address'>"+data["results"][place]["vicinity"]+"</a></div><br />");
-		}
-	});
-});
+        map = new google.maps.Map(document.getElementById('map'), {
+          mapTypeId: google.maps.MapTypeId.ROADMAP,
+          center: pyrmont,
+          zoom: 15
+        });
 
-</script>
+        var request = {
+          location: pyrmont,
+          radius: 500,
+          types: ['store']
+        };
+        infowindow = new google.maps.InfoWindow();
+        var service = new google.maps.places.PlacesService(map);
+        service.nearbySearch(request, callback);
+      }
+
+      function callback(results, status) {
+        if (status == google.maps.places.PlacesServiceStatus.OK) {
+          for (var i = 0; i < results.length; i++) {
+            createMarker(results[i]);
+          }
+        }
+      }
+
+      function createMarker(place) {
+        var placeLoc = place.geometry.location;
+        var marker = new google.maps.Marker({
+          map: map,
+          position: place.geometry.location
+        });
+
+        google.maps.event.addListener(marker, 'click', function() {
+          infowindow.setContent(place.name);
+          infowindow.open(map, this);
+        });
+      }
+
+      google.maps.event.addDomListener(window, 'load', initialize);
+    </script>
+  </head>
+  <body>
+    <div id="map"></div>
+    <div id="text">
+      <pre>
+var request = {
+  location: new google.maps.LatLng(41.1489, -81.3418),
+  radius: 500,
+  types: ['store']
+};
+      </pre>
+  </body>
+</html>
